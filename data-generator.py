@@ -7,10 +7,14 @@ def generate_data(num_samples):
     area = np.random.randint(1000, 5000, num_samples)
     bedrooms = np.random.randint(1, 6, num_samples)
     age = np.random.randint(0, 101, num_samples)
-    base_price = 50000
-    price = base_price + area * 10 + bedrooms * 5000 - age * 1000
-    price_noise = np.random.randn(num_samples) * 20000
+
+
+    base_price = 70000
+    price = base_price + area * 15 + bedrooms * 8000 - age * 500
+    price_noise = np.random.randn(num_samples) * 10000  
     price += price_noise.astype(int)
+    
+    price[price < 70000] = 70000 + np.abs(price_noise[price < 70000].astype(int))
 
     data = pd.DataFrame({'area': area, 'bedrooms': bedrooms, 'age': age, 'price': price})
 

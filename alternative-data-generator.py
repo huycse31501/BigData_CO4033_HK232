@@ -8,10 +8,13 @@ def generate_alternative_data(num_samples):
     year_built = np.random.randint(1900, 2021, num_samples)
     lot_size = np.random.randint(1000, 10000, num_samples)
     
-    base_price = 100000
-    price = base_price + square_feet * 20 + bathrooms * 10000 + (2020 - year_built) * 500
-    price_noise = np.random.randn(num_samples) * 25000
+
+    base_price = 70000
+    price = base_price + square_feet * 15 + bathrooms * 16000 - year_built * 500
+    price_noise = np.random.randn(num_samples) * 10000  
     price += price_noise.astype(int)
+    
+    price[price < 70000] = 70000 + np.abs(price_noise[price < 70000].astype(int))
     
     new_data = pd.DataFrame({
         'square_feet': square_feet,

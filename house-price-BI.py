@@ -54,20 +54,18 @@ def predict_price(model_choice, area, bedrooms, age):
         print("Lựa chọn không hợp lệ.")
         return None
     model = joblib.load(f'model_{model_name.replace(" ", "_")}.joblib')
-    
     scaler_X = joblib.load('scaler_X.joblib')
-    scaler_y = joblib.load('scaler_y.joblib')
-
-    scaler_y.fit(y_train.reshape(-1, 1))
-    joblib.dump(scaler_y, 'scaler_y.joblib')
-
-    user_data = np.array([[area, bedrooms, age]])
+    
+    user_data = pd.DataFrame(data=[[area, bedrooms, age]], columns=scaler_X.feature_names_in_)
+    
     user_data_scaled = scaler_X.transform(user_data)
     
     predicted_price_scaled = model.predict(user_data_scaled)
-
-    predicted_price = scaler_y.inverse_transform(predicted_price_scaled.reshape(-1, 1))[0, 0]
-
+    
+    predicted_price_scaled = predicted_price_scaled.reshape(-1, 1)
+    
+    scaler_y = joblib.load('scaler_y.joblib')
+    predicted_price = scaler_y.inverse_transform(predicted_price_scaled)[0, 0]
     
     return predicted_price
 

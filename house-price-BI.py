@@ -47,7 +47,7 @@ def predict_price(model_choice, area, bedrooms, age):
     return predicted_price[0]
 
 def main():
-    train_and_save_models('transformed-alternative-data.csv', 'house-price-data-after-preprocessing.csv')
+    # train_and_save_models('transformed-alternative-data.csv', 'house-price-data-after-preprocessing.csv')
 
     print("Vui lòng nhập thông tin chi tiết của ngôi nhà:")
     area, bedrooms, age = get_user_input()

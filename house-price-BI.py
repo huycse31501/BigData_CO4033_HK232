@@ -5,8 +5,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error, root_mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
-import numpy as np
 
 def train_and_save_models(data1_path, data2_path):
     data1 = pd.read_csv(data1_path)
@@ -17,14 +15,6 @@ def train_and_save_models(data1_path, data2_path):
     y = data['price']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    scaler_X = MinMaxScaler()
-    X_train_scaled = scaler_X.fit_transform(X_train)
-    joblib.dump(scaler_X, 'scaler_X.joblib') 
-
-    scaler_y = MinMaxScaler()
-    y_train_scaled = scaler_y.fit_transform(np.array(y_train).reshape(-1, 1))
-    joblib.dump(scaler_y, 'scaler_y.joblib')
-
     models = {
         'Linear Regression': LinearRegression(),
         'Decision Tree': DecisionTreeRegressor(),
@@ -32,7 +22,7 @@ def train_and_save_models(data1_path, data2_path):
     }
 
     for name, model in models.items():
-        model.fit(X_train_scaled, y_train)
+        model.fit(X_train, y_train)
         joblib.dump(model, f'model_{name.replace(" ", "_")}.joblib')
 
 def get_user_input():
@@ -40,8 +30,6 @@ def get_user_input():
     bedrooms = int(input("Nhập số lượng phòng ngủ: "))
     age = int(input("Nhập tuổi của ngôi nhà (tính bằng năm): "))
     return area, bedrooms, age
-
-
 
 def predict_price(model_choice, area, bedrooms, age):
     models = {
@@ -54,23 +42,12 @@ def predict_price(model_choice, area, bedrooms, age):
         print("Lựa chọn không hợp lệ.")
         return None
     model = joblib.load(f'model_{model_name.replace(" ", "_")}.joblib')
-    scaler_X = joblib.load('scaler_X.joblib')
-    
-    user_data = pd.DataFrame(data=[[area, bedrooms, age]], columns=scaler_X.feature_names_in_)
-    
-    user_data_scaled = scaler_X.transform(user_data)
-    
-    predicted_price_scaled = model.predict(user_data_scaled)
-    
-    predicted_price_scaled = predicted_price_scaled.reshape(-1, 1)
-    
-    scaler_y = joblib.load('scaler_y.joblib')
-    predicted_price = scaler_y.inverse_transform(predicted_price_scaled)[0, 0]
-    
-    return predicted_price
+    user_data = pd.DataFrame([[area, bedrooms, age]], columns=['area', 'bedrooms', 'age'])
+    predicted_price = model.predict(user_data)
+    return predicted_price[0]
 
 def main():
-    train_and_save_models('transformed-alternative-data.csv', 'house-price-data-after-preprocessing.csv')
+    train_and_save_models('transformed-alternative-data.csv', 'house-price-data-after-preprocessing.csv')  # Uncomment this line if the models have not been trained and saved yet.
 
     print("Vui lòng nhập thông tin chi tiết của ngôi nhà:")
     area, bedrooms, age = get_user_input()

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 
 data = pd.read_csv('house-price-data.csv')
 
@@ -24,8 +23,7 @@ if data_no_outliers.isnull().values.any():
     data_no_outliers.dropna(inplace=True)
 
 
-scaler = MinMaxScaler()
-data_normalized = pd.DataFrame(scaler.fit_transform(data_no_outliers), columns=data_no_outliers.columns)
+data_normalized = pd.DataFrame(data_no_outliers, columns=data_no_outliers.columns)
 
 file_path = 'transformed-alternative-data.csv'
 data_normalized.to_csv(file_path, index=False)
